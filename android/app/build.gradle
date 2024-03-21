@@ -1,4 +1,8 @@
 apply plugin: "com.android.application"
+project.ext.envConfigFiles = [
+    dev: ".env.dev",
+    prod: ".env.prod",
+]
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 
@@ -81,6 +85,12 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+    }
+    productFlavors {
+        dev {
+        }
+        prod {
+        }
     }
     signingConfigs {
         debug {
