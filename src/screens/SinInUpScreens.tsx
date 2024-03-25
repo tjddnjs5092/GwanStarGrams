@@ -55,7 +55,7 @@ const SignIn = ({onPressSignUp, navigation}) => {
   const [usrInputCheck, setUsrInputCheck] = useState(false);
   const [privateCheck, setPrivateCheck] = useState(true);
   const [focusedInput, setFocusedInput] = useState('');
-  const [privateUrl, setPrivateUrl] = useState(require('@/icons/private.png'));
+  const [privateUrl, setPrivateUrl] = useState(require('@/assets/images/private.png'));
   const rotateAnimation = useRef(new Animated.Value(0)).current; // 애니메이션 상태 초기화
   const [usrInfo, setUsrInfo] = useRecoilState(userInfoState);
 
@@ -85,10 +85,10 @@ const SignIn = ({onPressSignUp, navigation}) => {
   const privateCheckFc = () => {
     if (privateCheck) {
       setPrivateCheck(false);
-      setPrivateUrl(require('@/icons/notPrivate.png'));
+      setPrivateUrl(require('@/assets/images/notPrivate.png'));
     } else {
       setPrivateCheck(true);
-      setPrivateUrl(require('@/icons/private.png'));
+      setPrivateUrl(require('@/assets/images/private.png'));
     }
   };
 
@@ -417,7 +417,7 @@ const SignUp = ({onPressSignIn}) => {
             <Image
               className="w-24 h-24 rounded-full border-[#7e7b7b] border-2"
               resizeMode="cover"
-              source={selectedImage || require('@/icons/noImg.png')}
+              source={selectedImage || require('@/assets/images/noImg.png')}
             />
           </Pressable>
         </View>
@@ -469,8 +469,8 @@ const SignUp = ({onPressSignIn}) => {
               className="mr-4"
               source={
                 isPwdPrivate
-                  ? require('@/icons/private.png')
-                  : require('@/icons/notPrivate.png')
+                  ? require('@/assets/images/private.png')
+                  : require('@/assets/images/notPrivate.png')
               }
             />
           </Pressable>
@@ -495,8 +495,8 @@ const SignUp = ({onPressSignIn}) => {
               className="mr-4"
               source={
                 isPwdCkPrivate
-                  ? require('@/icons/private.png')
-                  : require('@/icons/notPrivate.png')
+                  ? require('@/assets/images/private.png')
+                  : require('@/assets/images/notPrivate.png')
               }
             />
           </Pressable>

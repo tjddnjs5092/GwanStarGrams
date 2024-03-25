@@ -1,5 +1,5 @@
 import {Text, View} from 'react-native';
-import { MypageTabViewScreen } from "@/screens/myPage/MypageTabViewScreen.tsx";
+import { MypageTabViewScreen } from "@/screens/myPage/MypageTabViewScreen";
 
 export const HomeScreens = ({navigation, route}) => {
   return (

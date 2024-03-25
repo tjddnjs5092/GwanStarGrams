@@ -1,12 +1,12 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {Image, Pressable, Text, View} from 'react-native';
-import {HomeScreens} from '@/screens/HomeScreens.tsx';
+import {HomeScreens} from '@/screens/HomeScreens';
 import Svg, {Line, Path} from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useRecoilValue, useResetRecoilState} from 'recoil';
-import {userInfoState} from '@/store/usrInfoState.ts';
-import { MyPageScreen } from "@/screens/myPage/MyPageScreen.tsx";
+import {userInfoState} from '@/store/usrInfoState';
+import { MyPageScreen } from "@/screens/myPage/MyPageScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -272,7 +272,7 @@ export const BottomTabNavigationScrren = () => {
                   source={
                     memberInfo?.usrImage?.uri !== ''
                       ? {uri: memberInfo.usrImage}
-                      : require('@/icons/noImg.png')
+                      : require('@/assets/images/noImg.png')
                   }
                   resizeMode="cover"
                 />
@@ -284,7 +284,7 @@ export const BottomTabNavigationScrren = () => {
                   source={
                     memberInfo?.usrImage?.uri !== ''
                       ? {uri: memberInfo.usrImage}
-                      : require('@/icons/noImg.png')
+                      : require('@/assets/images/noImg.png')
                   }
                   resizeMode="cover"
                 />

@@ -1,10 +1,10 @@
 import {useRecoilValue} from 'recoil';
-import {userInfoState} from '@/store/usrInfoState.ts';
+import {userInfoState} from '@/store/usrInfoState';
 import {Image, Text, View} from 'react-native';
 import Svg, {Line, Path} from 'react-native-svg';
-import {Icon} from '@/components/Icon.tsx';
+import {Icon} from '@/components/Icon';
 import {Button} from '@/components/Button';
-import { MypageTabViewScreen } from "@/screens/myPage/MypageTabViewScreen.tsx";
+import { MypageTabViewScreen } from "@/screens/myPage/MypageTabViewScreen";
 
 export const MyPageScreen = ({navigation, route}) => {
   const {memberInfo, storeMbrCd} = useRecoilValue(userInfoState);
@@ -103,7 +103,7 @@ export const MyPageScreen = ({navigation, route}) => {
                 source={
                   memberInfo?.usrImage?.uri !== ''
                     ? {uri: memberInfo.usrImage}
-                    : require('@/icons/noImg.png')
+                    : require('@/assets/images/noImg.png')
                 }
                 resizeMode="cover"
               />
