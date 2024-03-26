@@ -107,8 +107,9 @@ export const MyPageScreen = ({navigation, route}) => {
                 }
                 resizeMode="cover"
               />
-              <View className="flex-row absolute right-0 bottom-0 h-10 w-10 rounded-full border-4 border-black bg-white justify-center items-center">
-                <Icon name="camera-outline" size={7} color="black" />
+              <View className="flex-row absolute right-0 bottom-0 h-10 w-10 rounded-full border-4 border-black justify-center items-center">
+                {/*<Icon name="camera-outline" size={7} color="black" />*/}
+                <Image className="w-8 h-8" source={require('@/assets/images/plus.png')} />
               </View>
             </View>
             <View className="flex-1 flex-row justify-around">

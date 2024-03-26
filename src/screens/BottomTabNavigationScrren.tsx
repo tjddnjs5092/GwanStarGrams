@@ -23,6 +23,7 @@ const ProFileScreen = () => {
   const resetUserInfo = useResetRecoilState(userInfoState);
   const privateCheckFc = async () => {
     await AsyncStorage.removeItem('loginUsrId');
+    await AsyncStorage.removeItem('loginUsrId');
     resetUserInfo();
   };
   return (

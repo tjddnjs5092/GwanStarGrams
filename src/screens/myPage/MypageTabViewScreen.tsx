@@ -1,13 +1,119 @@
 import {useState} from 'react';
 import {TabBar, TabView} from 'react-native-tab-view';
-import {Dimensions, SafeAreaView, Text, View} from 'react-native';
+import { Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import Svg, { Circle, Line, Path, Rect } from "react-native-svg";
 export const windowWidth = Dimensions.get('window').width;
-
+export const imageWidthSize = windowWidth / 3;
+export const imageHeightSize = windowWidth / 3;
 const BoardRoute = ({board_num}) => {
+  const images = [
+    { id: '1', src: require('@/assets/images/dummy/dummy1.png') },
+    { id: '2', src: require('@/assets/images/dummy/dummy2.png') },
+    { id: '3', src: require('@/assets/images/dummy/dummy3.png') },
+    { id: '5', src: require('@/assets/images/dummy/dummy4.png') },
+    { id: '6', src: require('@/assets/images/dummy/dummy5.png') },
+    { id: '7', src: require('@/assets/images/dummy/dummy6.png') },
+    { id: '8', src: require('@/assets/images/dummy/dummy7.png') },
+    { id: '9', src: require('@/assets/images/dummy/dummy8.png') },
+    { id: '10', src: require('@/assets/images/dummy/dummy9.png') },
+    { id: '11', src: require('@/assets/images/dummy/dummy10.png') },
+    { id: '12', src: require('@/assets/images/dummy/dummy11.png') },
+    { id: '13', src: require('@/assets/images/dummy/dummy12.png') },
+    { id: '14', src: require('@/assets/images/dummy/dummy13.png') },
+    { id: '15', src: require('@/assets/images/dummy/dummy14.png') },
+    // Add more images as needed
+  ];
+
+  const renderImage = (image) => (
+    <View key={image.id} style={styles.imageContainer}>
+      <Image style={styles.image} source={image.src} />
+      {/* 이미지가 여러장일때 */}
+      <View className="flex-row absolute right-0 top-0 h-10 w-10 justify-center items-center">
+        <Svg fill="#fff" height="22" viewBox="0 0 48 48" width="22">
+          <Path stroke="#fff" d="M34.8 29.7V11c0-2.9-2.3-5.2-5.2-5.2H11c-2.9 0-5.2 2.3-5.2 5.2v18.7c0 2.9 2.3 5.2 5.2 5.2h18.7c2.8-.1 5.1-2.4 5.1-5.2zM39.2 15v16.1c0 4.5-3.7 8.2-8.2 8.2H14.9c-.6 0-.9.7-.5 1.1 1 1.1 2.4 1.8 4.1 1.8h13.4c5.7 0 10.3-4.6 10.3-10.3V18.5c0-1.6-.7-3.1-1.8-4.1-.5-.4-1.2 0-1.2.6z" />
+        </Svg>
+      </View>
+    </View>
+  );
+
+  // Function to render rows of images
+  const renderImageRows = (images) => {
+    let rows = [];
+    for (let i = 0; i < images.length; i += 3) {
+      rows.push(
+        <View key={i} style={styles.row}>
+          {images.slice(i, i + 3).map((image) => renderImage(image))}
+        </View>
+      );
+    }
+    return rows;
+  };
   return (
-    <View>
-      <Text className="text-white">gd</Text>
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView>
+        <View style={{ flex: 1 }}>
+          <View style={{ flex: 1 }}>
+            {renderImageRows(images)}
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+    /*<View className="flex-1">
+      <View className="flex-1">
+        <View className="flex-1 justify-center items-center">
+          <View className="flex-row h-20 w-20 rounded-full border-2 border-white justify-center items-center">
+            <Image className="w-[70%] h-[70%]" source={require('@/assets/images/camera.png')} />
+          </View>
+          <View>
+            <Text className="top-5 font-bold text-3xl text-white">게시물 없음</Text>
+          </View>
+        </View>
+      </View>
+    </View>*/
+  );
+};
+const styles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+  },
+  image: {
+    width: imageWidthSize,
+    height: imageHeightSize,
+    margin: 1.5,
+    resizeMode: 'cover',
+  },
+});
+const ReelsRoute = ({board_num}) => {
+  return (
+    <View className="flex-1">
+      <View className="flex-1">
+        <View className="flex-1 top-10 items-center">
+          <Text className="text-white text-[20px] font-bold text-center">{`전 세계에 여러분의\n순간을 공유해보세요.`}</Text>
+          <Text className="top-5 font-bold text-blue-500">첫 릴스 만들기</Text>
+        </View>
+      </View>
+    </View>
+  );
+};
+const TaggedRoute = ({board_num}) => {
+  return (
+    <View className="flex-1">
+      <View className="flex-1">
+        <View className="flex-1 justify-center items-center">
+          <View className="flex-row h-[32%] w-[30%] rounded-full border-2 border-white justify-center items-center">
+            <Svg fill="#fff" height="80" width="80" viewBox="0 0 24 24">
+              <Path d="M10.201 3.797 12 1.997l1.799 1.8a1.59 1.59 0 0 0 1.124.465h5.259A1.818 1.818 0 0 1 22 6.08v14.104a1.818 1.818 0 0 1-1.818 1.818H3.818A1.818 1.818 0 0 1 2 20.184V6.08a1.818 1.818 0 0 1 1.818-1.818h5.26a1.59 1.59 0 0 0 1.123-.465Z" fill="none" stroke="#fff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" />
+              <Path d="M18.598 22.002V21.4a3.949 3.949 0 0 0-3.948-3.949H9.495A3.949 3.949 0 0 0 5.546 21.4v.603" fill="none" stroke="#fff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" />
+              <Circle cx="12.072" cy="11.075" fill="none" r="3.556" stroke="#fff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" />
+            </Svg>
+          </View>
+          <View className="top-5 justify-center items-center w-80">
+            <Text className="text-white text-2xl font-bold">내가 태그된 사진과 동영상</Text>
+            <Text className="top-2 text-[#a8a8a8] text-center">사람들이 회원님을 사진 및 동영상에 태그하면 태그된 사진 및 동영상이 여기에 표시됩니다.</Text>
+          </View>
+        </View>
+      </View>
     </View>
   );
 };
@@ -24,9 +130,9 @@ export const MypageTabViewScreen = ({navigation, route}) => {
       case 'board':
         return <BoardRoute board_num="010" />;
       case 'reels':
-        return <BoardRoute board_num="020" />;
+        return <ReelsRoute board_num="020" />;
       case 'tagged':
-        return <BoardRoute board_num="030" />;
+        return <TaggedRoute board_num="030" />;
       default:
         return null;
     }

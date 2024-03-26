@@ -100,7 +100,7 @@ const SignIn = ({onPressSignUp, navigation}) => {
       const gistsUri = Config.GISTS_URI;
       const response = await fetch(`https://api.github.com/gists/${gistsUri}`);
       const data = await response.json();
-      const content = JSON.parse(data.files.usrInFo.content);
+      const content = JSON.parse(data.files['gwanStarGramUsrInFo.json'].content);
       const isUsrNameUsed = content.some(
         item => usrName === item.usrName && usrPwd === item.usrPwd,
       );
@@ -325,7 +325,7 @@ const SignUp = ({onPressSignIn}) => {
       const gistsUri = Config.GISTS_URI;
       const response = await fetch(`https://api.github.com/gists/${gistsUri}`);
       const data = await response.json();
-      const content = JSON.parse(data.files.usrInFo.content);
+      const content = JSON.parse(data.files['gwanStarGramUsrInFo.json'].content);
       const isUsrNameUsed = content.some(item => usrName === item.usrName);
       if (isUsrNameUsed) {
         Alert.alert('이미 사용중인 전화번호, 사용자 이름 또는 이메일입니다.');
@@ -363,17 +363,20 @@ const SignUp = ({onPressSignIn}) => {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `token ${githubKey}`,
+          Authorization: `Bearer ${githubKey}`,
         },
         body: JSON.stringify({
-          description: 'Updated gist description',
+          gist_id: githubKey,
+          description: 'An updated gist description',
           files: {
-            usrInFo: {
+            'gwanStarGramUsrInFo.json': {
               content: JSON.stringify(updatedContent),
             },
           },
         }),
-      });
+      }).then(response => response.json())
+        .then(data => console.log('data : ', data))
+        .catch(error => console.error('Error:', error));
       Alert.alert(
         '회원가입이 완료되었습니다!\n회원가입승인후 1~2분후에 로그인이 가능합니다.',
         '',
@@ -381,13 +384,13 @@ const SignUp = ({onPressSignIn}) => {
           {
             text: 'OK',
             onPress: () => {
-              setUsrName('');
-              setUsrNikName('');
-              setUsrPwd('');
-              setUsrPwdCk('');
-              setSelectedImage(null);
-              setSelectedImageUrl('');
-              onPressSignIn();
+              // setUsrName('');
+              // setUsrNikName('');
+              // setUsrPwd('');
+              // setUsrPwdCk('');
+              // setSelectedImage(null);
+              // setSelectedImageUrl('');
+              // onPressSignIn();
             },
           },
         ],
