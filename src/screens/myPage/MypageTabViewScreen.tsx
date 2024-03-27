@@ -1,7 +1,8 @@
-import {useState} from 'react';
+import { useEffect, useState } from "react";
 import {TabBar, TabView} from 'react-native-tab-view';
 import { Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import Svg, { Circle, Line, Path, Rect } from "react-native-svg";
+import { getGistContent } from "@/types/commAxios";
 export const windowWidth = Dimensions.get('window').width;
 export const imageWidthSize = windowWidth / 3;
 export const imageHeightSize = windowWidth / 3;
@@ -23,13 +24,68 @@ const BoardRoute = ({board_num}) => {
     { id: '15', src: require('@/assets/images/dummy/dummy14.png') },
     // Add more images as needed
   ];
+  const js =
+  {
+    "test": [
+      {
+        "image": [
+          "https://i.ibb.co/vZKVhkj/dummy1.png",
+          "https://i.ibb.co/R27L6Nh/dummy2.png",
+          "https://i.ibb.co/vZKVhkj/dummy3.png",
+          "https://i.ibb.co/vZKVhkj/dummy4.png",
+          "https://i.ibb.co/vZKVhkj/dummy5.png"
+        ],
+        "cont": "test 내용입니다.",
+        "like": 0,
+        "likeUsr": [
+          {
+            "nickName": ["test", "test2"]
+          }
+        ],
+        "comment": [
+          {
+            "nickName": "test2",
+            "commentCont": "오 대박이다요",
+            "commentLike": 2,
+            "commentLikeUsr": [{
+                "nickName": ["test", "test2"]
+              }
+            ],
+            "reply": [
+              {
+                "nickname": "test",
+                "replyCont": "감사합니다.",
+                "replyLike": 1,
+                "replyLikeUsr": [
+                  {
+                    "nickName": ["test2"]
+                  }
+                ],
+              }
+            ]
+          },
+          {
+            "nickName": "test3",
+            "commentCont": "와 이쁘다 사고싶네요",
+            "commentLike": 0,
+            "commentLikeUsr": [{
+              "nickName": []
+            }
+            ],
+            "reply": [{}]
+          }
+        ],
+      }
+    ]
+  }
+  console.log('js : ', js.test[0].image[0]);
 
   const renderImage = (image) => (
     <View key={image.id} style={styles.imageContainer}>
       <Image style={styles.image} source={image.src} />
       {/* 이미지가 여러장일때 */}
       <View className="flex-row absolute right-0 top-0 h-10 w-10 justify-center items-center">
-        <Svg fill="#fff" height="22" viewBox="0 0 48 48" width="22">
+        <Svg fill="#fff" width="22" height="22" viewBox="0 0 48 48">
           <Path stroke="#fff" d="M34.8 29.7V11c0-2.9-2.3-5.2-5.2-5.2H11c-2.9 0-5.2 2.3-5.2 5.2v18.7c0 2.9 2.3 5.2 5.2 5.2h18.7c2.8-.1 5.1-2.4 5.1-5.2zM39.2 15v16.1c0 4.5-3.7 8.2-8.2 8.2H14.9c-.6 0-.9.7-.5 1.1 1 1.1 2.4 1.8 4.1 1.8h13.4c5.7 0 10.3-4.6 10.3-10.3V18.5c0-1.6-.7-3.1-1.8-4.1-.5-.4-1.2 0-1.2.6z" />
         </Svg>
       </View>

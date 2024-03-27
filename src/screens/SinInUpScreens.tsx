@@ -21,7 +21,8 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Config from 'react-native-config';
 import {useRecoilState} from 'recoil';
-import {userInfoState} from '@/store/usrInfoState.ts';
+import {userInfoState} from '@/store/usrInfoState';
+import { getGistContent, updateGist } from "@/types/commAxios";
 
 export const SinInUpScreens = ({navigation, route}) => {
   const cardRef = useRef<CardFlip>(null);
@@ -97,14 +98,11 @@ const SignIn = ({onPressSignUp, navigation}) => {
     startAnimation();
     if (usrInputCheck) {
       setLoginCheck(true);
-      const gistsUri = Config.GISTS_URI;
-      const response = await fetch(`https://api.github.com/gists/${gistsUri}`);
-      const data = await response.json();
-      const content = JSON.parse(data.files['gwanStarGramUsrInFo.json'].content);
-      const isUsrNameUsed = content.some(
+      const data: any [] = await getGistContent('gwanStarGramUsrInFo.json');
+      const isUsrNameUsed = data.some(
         item => usrName === item.usrName && usrPwd === item.usrPwd,
       );
-      const userInfo = content.find(
+      const userInfo = data.find(
         item => usrName === item.usrName && usrPwd === item.usrPwd,
       );
 
@@ -121,14 +119,16 @@ const SignIn = ({onPressSignUp, navigation}) => {
             [
               {
                 text: 'OK',
-                onPress: () => {
-                  AsyncStorage.setItem('loginUsrId', usrName);
+                onPress: async () => {
+                  await AsyncStorage.setItem('loginUsrId', usrName);
                   setUsrInfo({
                     ...usrInfo,
                     isLogin: true,
                     usrName: userInfo.usrName,
                     memberInfo: userInfo,
                   });
+                  const stringifiedUserInfo = JSON.stringify(userInfo);
+                  await AsyncStorage.setItem('userInfo', stringifiedUserInfo);
                   setLoginCheck(false);
                   navigation.navigate('BottomTabNavigation');
                 },
@@ -322,11 +322,8 @@ const SignUp = ({onPressSignIn}) => {
         Alert.alert('전화번호, 사용자 이름 또는 이메일을 입력해주세요.');
         return;
       }
-      const gistsUri = Config.GISTS_URI;
-      const response = await fetch(`https://api.github.com/gists/${gistsUri}`);
-      const data = await response.json();
-      const content = JSON.parse(data.files['gwanStarGramUsrInFo.json'].content);
-      const isUsrNameUsed = content.some(item => usrName === item.usrName);
+      const data: any [] = await getGistContent('gwanStarGramUsrInFo.json');
+      const isUsrNameUsed = data.some(item => usrName === item.usrName);
       if (isUsrNameUsed) {
         Alert.alert('이미 사용중인 전화번호, 사용자 이름 또는 이메일입니다.');
         return false;
@@ -357,45 +354,31 @@ const SignUp = ({onPressSignIn}) => {
           usrImage: selectedImageUrl || '',
         },
       ];
-      const githubKey = Config.GITHUB_API_KEY;
-      const updatedContent = [...content, ...joinJsonData];
-      await fetch(`https://api.github.com/gists/${gistsUri}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${githubKey}`,
-        },
-        body: JSON.stringify({
-          gist_id: githubKey,
-          description: 'An updated gist description',
-          files: {
-            'gwanStarGramUsrInFo.json': {
-              content: JSON.stringify(updatedContent),
+      const updatedContent = [...data, ...joinJsonData];
+      const updateStatus: any = await updateGist('gwanStarGramUsrInFo.json', updatedContent);
+      if (updateStatus === 200) {
+        Alert.alert(
+          '회원가입이 완료되었습니다!\n회원가입승인후 1~2분후에 로그인이 가능합니다.',
+          '',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                setUsrName('');
+                setUsrNikName('');
+                setUsrPwd('');
+                setUsrPwdCk('');
+                setSelectedImage(null);
+                setSelectedImageUrl('');
+                onPressSignIn();
+              },
             },
-          },
-        }),
-      }).then(response => response.json())
-        .then(data => console.log('data : ', data))
-        .catch(error => console.error('Error:', error));
-      Alert.alert(
-        '회원가입이 완료되었습니다!\n회원가입승인후 1~2분후에 로그인이 가능합니다.',
-        '',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              // setUsrName('');
-              // setUsrNikName('');
-              // setUsrPwd('');
-              // setUsrPwdCk('');
-              // setSelectedImage(null);
-              // setSelectedImageUrl('');
-              // onPressSignIn();
-            },
-          },
-        ],
-        {cancelable: false},
-      );
+          ],
+          {cancelable: false},
+        );
+      } else {
+        console.log('update Status not 200');
+      }
     } catch (error) {
       console.error(error);
     }

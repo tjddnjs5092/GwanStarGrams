@@ -23,7 +23,7 @@ const ProFileScreen = () => {
   const resetUserInfo = useResetRecoilState(userInfoState);
   const privateCheckFc = async () => {
     await AsyncStorage.removeItem('loginUsrId');
-    await AsyncStorage.removeItem('loginUsrId');
+    await AsyncStorage.removeItem('userInfo');
     resetUserInfo();
   };
   return (
@@ -59,7 +59,7 @@ export const BottomTabNavigationScrren = () => {
       }}>
       <Tab.Screen
         name="Home"
-        component={HomeNavigator}
+        component={ProFileScreen}
         options={{
           tabBarIcon: ({focused}) =>
             focused ? (
