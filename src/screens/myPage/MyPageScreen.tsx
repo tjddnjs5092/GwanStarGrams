@@ -101,7 +101,7 @@ export const MyPageScreen = ({navigation, route}) => {
               <Image
                 className="w-[100%] h-[100%] rounded-full"
                 source={
-                  memberInfo?.usrImage?.uri !== ''
+                  memberInfo?.usrImage !== ''
                     ? {uri: memberInfo.usrImage}
                     : require('@/assets/images/noImg.png')
                 }

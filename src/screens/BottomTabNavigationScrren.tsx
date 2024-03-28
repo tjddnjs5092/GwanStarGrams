@@ -44,7 +44,6 @@ const HomeNavigator = () => {
 };
 export const BottomTabNavigationScrren = () => {
   const {memberInfo, storeMbrCd} = useRecoilValue(userInfoState);
-  console.log('memberInfo.usrImage : ', memberInfo.usrImage);
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -271,7 +270,7 @@ export const BottomTabNavigationScrren = () => {
                 <Image
                   className="w-[100%] h-[100%] rounded-full border-white border-2"
                   source={
-                    memberInfo?.usrImage?.uri !== ''
+                    memberInfo?.usrImage !== ''
                       ? {uri: memberInfo.usrImage}
                       : require('@/assets/images/noImg.png')
                   }
@@ -283,7 +282,7 @@ export const BottomTabNavigationScrren = () => {
                 <Image
                   className="w-[100%] h-[100%] rounded-full"
                   source={
-                    memberInfo?.usrImage?.uri !== ''
+                    memberInfo?.usrImage !== ''
                       ? {uri: memberInfo.usrImage}
                       : require('@/assets/images/noImg.png')
                   }

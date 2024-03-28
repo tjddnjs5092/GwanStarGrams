@@ -3,129 +3,73 @@ import {TabBar, TabView} from 'react-native-tab-view';
 import { Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import Svg, { Circle, Line, Path, Rect } from "react-native-svg";
 import { getGistContent } from "@/types/commAxios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRecoilValue } from "recoil";
+import { userInfoState } from "@/store/usrInfoState";
 export const windowWidth = Dimensions.get('window').width;
 export const imageWidthSize = windowWidth / 3;
 export const imageHeightSize = windowWidth / 3;
-const BoardRoute = ({board_num}) => {
-  const images = [
-    { id: '1', src: require('@/assets/images/dummy/dummy1.png') },
-    { id: '2', src: require('@/assets/images/dummy/dummy2.png') },
-    { id: '3', src: require('@/assets/images/dummy/dummy3.png') },
-    { id: '5', src: require('@/assets/images/dummy/dummy4.png') },
-    { id: '6', src: require('@/assets/images/dummy/dummy5.png') },
-    { id: '7', src: require('@/assets/images/dummy/dummy6.png') },
-    { id: '8', src: require('@/assets/images/dummy/dummy7.png') },
-    { id: '9', src: require('@/assets/images/dummy/dummy8.png') },
-    { id: '10', src: require('@/assets/images/dummy/dummy9.png') },
-    { id: '11', src: require('@/assets/images/dummy/dummy10.png') },
-    { id: '12', src: require('@/assets/images/dummy/dummy11.png') },
-    { id: '13', src: require('@/assets/images/dummy/dummy12.png') },
-    { id: '14', src: require('@/assets/images/dummy/dummy13.png') },
-    { id: '15', src: require('@/assets/images/dummy/dummy14.png') },
-    // Add more images as needed
-  ];
-  const js =
-  {
-    "test": [
-      {
-        "image": [
-          "https://i.ibb.co/vZKVhkj/dummy1.png",
-          "https://i.ibb.co/R27L6Nh/dummy2.png",
-          "https://i.ibb.co/vZKVhkj/dummy3.png",
-          "https://i.ibb.co/vZKVhkj/dummy4.png",
-          "https://i.ibb.co/vZKVhkj/dummy5.png"
-        ],
-        "cont": "test 내용입니다.",
-        "like": 0,
-        "likeUsr": [
-          {
-            "nickName": ["test", "test2"]
-          }
-        ],
-        "comment": [
-          {
-            "nickName": "test2",
-            "commentCont": "오 대박이다요",
-            "commentLike": 2,
-            "commentLikeUsr": [{
-                "nickName": ["test", "test2"]
-              }
-            ],
-            "reply": [
-              {
-                "nickname": "test",
-                "replyCont": "감사합니다.",
-                "replyLike": 1,
-                "replyLikeUsr": [
-                  {
-                    "nickName": ["test2"]
-                  }
-                ],
-              }
-            ]
-          },
-          {
-            "nickName": "test3",
-            "commentCont": "와 이쁘다 사고싶네요",
-            "commentLike": 0,
-            "commentLikeUsr": [{
-              "nickName": []
-            }
-            ],
-            "reply": [{}]
-          }
-        ],
-      }
-    ]
-  }
-  console.log('js : ', js.test[0].image[0]);
+const BoardRoute = ({memberNm}) => {
+  const [boardList, setBpardList] = useState<[] | null>([]);
 
-  const renderImage = (image) => (
-    <View key={image.id} style={styles.imageContainer}>
-      <Image style={styles.image} source={image.src} />
-      {/* 이미지가 여러장일때 */}
-      <View className="flex-row absolute right-0 top-0 h-10 w-10 justify-center items-center">
-        <Svg fill="#fff" width="22" height="22" viewBox="0 0 48 48">
-          <Path stroke="#fff" d="M34.8 29.7V11c0-2.9-2.3-5.2-5.2-5.2H11c-2.9 0-5.2 2.3-5.2 5.2v18.7c0 2.9 2.3 5.2 5.2 5.2h18.7c2.8-.1 5.1-2.4 5.1-5.2zM39.2 15v16.1c0 4.5-3.7 8.2-8.2 8.2H14.9c-.6 0-.9.7-.5 1.1 1 1.1 2.4 1.8 4.1 1.8h13.4c5.7 0 10.3-4.6 10.3-10.3V18.5c0-1.6-.7-3.1-1.8-4.1-.5-.4-1.2 0-1.2.6z" />
-        </Svg>
+  useEffect(() => {
+    const getGistBoard = async () => {
+      const boardsString = await getGistContent('gwanStarGramsBoard.json');
+      const images = boardsString[memberNm].map((post, index) => ({
+        id: `image-${index}`, // 고유한 id 값 생성
+        src: post.image[0], // 첫 번째 이미지 URL
+        multiple: post.image.length > 1, // 여러 이미지 여부 확인
+      }));
+      setBpardList(images);
+    };
+    getGistBoard();
+  }, []);
+
+  const renderImageRows = () => {
+    return (
+      <View style={styles.row}>
+        {boardList.map((image, i) => renderImage(image, i))}
       </View>
-    </View>
-  );
-
-  // Function to render rows of images
-  const renderImageRows = (images) => {
-    let rows = [];
-    for (let i = 0; i < images.length; i += 3) {
-      rows.push(
-        <View key={i} style={styles.row}>
-          {images.slice(i, i + 3).map((image) => renderImage(image))}
-        </View>
-      );
-    }
-    return rows;
+    );
   };
+
+  const renderImage = (image, indexNum) => {
+    const isLastImage = (indexNum + 1) % 3 === 0;
+    return (
+      <View key={indexNum} style={styles.imageContainer}>
+        <Image style={styles.image} source={{uri: image.src}} />
+        {image.multiple && (
+          <View className={`flex-row absolute ${isLastImage ? 'right-2' : 'right-0'} top-0 h-10 w-10 justify-center items-center`}>
+            <Svg fill="#fff" width="22" height="22" viewBox="0 0 48 48">
+              <Path stroke="#fff" d="M34.8 29.7V11c0-2.9-2.3-5.2-5.2-5.2H11c-2.9 0-5.2 2.3-5.2 5.2v18.7c0 2.9 2.3 5.2 5.2 5.2h18.7c2.8-.1 5.1-2.4 5.1-5.2zM39.2 15v16.1c0 4.5-3.7 8.2-8.2 8.2H14.9c-.6 0-.9.7-.5 1.1 1 1.1 2.4 1.8 4.1 1.8h13.4c5.7 0 10.3-4.6 10.3-10.3V18.5c0-1.6-.7-3.1-1.8-4.1-.5-.4-1.2 0-1.2.6z" />
+            </Svg>
+          </View>
+        )}
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
         <View style={{ flex: 1 }}>
-          <View style={{ flex: 1 }}>
-            {renderImageRows(images)}
-          </View>
+          {boardList && boardList?.length > 0 ? (
+            <View style={{ flex: 1 }}>
+              {renderImageRows()}
+            </View>
+          ) : (
+            <View className="flex-1 justify-center items-center">
+              <View className="flex-row h-20 w-20 rounded-full border-2 border-white justify-center items-center">
+                <Image className="w-[70%] h-[70%]" source={require('@/assets/images/camera.png')} />
+              </View>
+              <View>
+                <Text className="top-5 font-bold text-3xl text-white">게시물 없음</Text>
+              </View>
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
-    /*<View className="flex-1">
-      <View className="flex-1">
-        <View className="flex-1 justify-center items-center">
-          <View className="flex-row h-20 w-20 rounded-full border-2 border-white justify-center items-center">
-            <Image className="w-[70%] h-[70%]" source={require('@/assets/images/camera.png')} />
-          </View>
-          <View>
-            <Text className="top-5 font-bold text-3xl text-white">게시물 없음</Text>
-          </View>
-        </View>
-      </View>
-    </View>*/
   );
 };
 const styles = StyleSheet.create({
@@ -140,7 +84,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
 });
-const ReelsRoute = ({board_num}) => {
+const ReelsRoute = ({memberNm}) => {
   return (
     <View className="flex-1">
       <View className="flex-1">
@@ -152,7 +96,7 @@ const ReelsRoute = ({board_num}) => {
     </View>
   );
 };
-const TaggedRoute = ({board_num}) => {
+const TaggedRoute = ({memberNm}) => {
   return (
     <View className="flex-1">
       <View className="flex-1">
@@ -174,6 +118,7 @@ const TaggedRoute = ({board_num}) => {
   );
 };
 export const MypageTabViewScreen = ({navigation, route}) => {
+  const {memberInfo, storeMbrCd} = useRecoilValue(userInfoState);
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     {key: 'board', title: '게시글', board_num: '010'},
@@ -184,11 +129,11 @@ export const MypageTabViewScreen = ({navigation, route}) => {
   const renderScreen = ({route}) => {
     switch (route.key) {
       case 'board':
-        return <BoardRoute board_num="010" />;
+        return <BoardRoute memberNm={memberInfo.usrName} />;
       case 'reels':
-        return <ReelsRoute board_num="020" />;
+        return <ReelsRoute memberNm={memberInfo.usrName} />;
       case 'tagged':
-        return <TaggedRoute board_num="030" />;
+        return <TaggedRoute memberNm={memberInfo.usrName} />;
       default:
         return null;
     }
