@@ -2,7 +2,6 @@ import {useRecoilValue} from 'recoil';
 import {userInfoState} from '@/store/usrInfoState';
 import {Image, Text, View} from 'react-native';
 import Svg, {Line, Path} from 'react-native-svg';
-import {Icon} from '@/components/Icon';
 import {Button} from '@/components/Button';
 import { MypageTabViewScreen } from "@/screens/myPage/MypageTabViewScreen";
 

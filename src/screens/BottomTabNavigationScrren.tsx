@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useRecoilValue, useResetRecoilState} from 'recoil';
 import {userInfoState} from '@/store/usrInfoState';
 import { MyPageScreen } from "@/screens/myPage/MyPageScreen";
+import { BoardDetailScreen } from "@/screens/board/BoardDetailScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -39,6 +40,16 @@ const HomeNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="Main" component={HomeScreens} />
+      <Stack.Screen name="BoardDetail" component={BoardDetailScreen} />
+    </Stack.Navigator>
+  );
+};
+
+const MyPageNavigator = () => {
+  return (
+    <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Screen name="Main" component={MyPageScreen} />
+      <Stack.Screen name="BoardDetail" component={BoardDetailScreen} />
     </Stack.Navigator>
   );
 };
@@ -58,7 +69,7 @@ export const BottomTabNavigationScrren = () => {
       }}>
       <Tab.Screen
         name="Home"
-        component={ProFileScreen}
+        component={HomeNavigator}
         options={{
           tabBarIcon: ({focused}) =>
             focused ? (
@@ -262,7 +273,7 @@ export const BottomTabNavigationScrren = () => {
       />
       <Tab.Screen
         name="ProFile"
-        component={MyPageScreen}
+        component={MyPageNavigator}
         options={{
           tabBarIcon: ({focused}) =>
             focused ? (

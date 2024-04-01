@@ -1,0 +1,82 @@
+{
+  "test": [
+    {
+      "board_cd": "20240328112842",
+      "usrImage":"https://i.ibb.co/xJgcjfR/jpg.jpg",
+      "image": [
+        "https://i.ibb.co/xJgcjfR/jpg.jpg",
+        "https://i.ibb.co/9hZQRq0/png.png",
+        "https://i.ibb.co/f4p4Hc6/png.png"
+      ],
+      "cont": "test 내용입니다.",
+      "like": 2,
+      "likeUsr": [
+        {
+          "nickName": ["test", "test2"]
+        }
+      ],
+      "comment": [
+        {
+          "nickName": "test2",
+          "commentCont": "오 대박이다요",
+          "commentLike": 2,
+          "commentLikeUsr": [{
+            "nickName": ["test", "test2"]
+          }
+          ],
+          "reply": [
+            {
+              "nickname": "test",
+              "replyCont": "감사합니다.",
+              "replyLike": 1,
+              "replyLikeUsr": [
+                {
+                  "nickName": ["test2"]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "nickName": "test3",
+          "commentCont": "와 이쁘다 사고싶네요",
+          "commentLike": 0,
+          "commentLikeUsr": [{
+            "nickName": []
+          }
+          ],
+          "reply": [{}]
+        }
+      ]
+    },
+    {
+      "board_cd": "20240328154412",
+      "image": [
+        "https://i.ibb.co/VDhsy90/jpg.jpg"
+      ],
+      "cont": "test 두번째 글입니다.",
+      "like": 0,
+      "likeUsr": [
+        {
+          "nickName": []
+        }
+      ],
+      "comment": [{}]
+    },
+    {
+      "board_cd": "20240401095156",
+      "image": [
+        "https://i.ibb.co/KbL09X8/png.png",
+        "https://i.ibb.co/N9C7F03/jpg.jpg"
+      ],
+      "cont": "test 세번째 글입니다.",
+      "like": 0,
+      "likeUsr": [
+        {
+          "nickName": []
+        }
+      ],
+      "comment": [{}]
+    }
+  ]
+}

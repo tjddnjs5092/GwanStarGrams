@@ -1,26 +1,29 @@
 import { useEffect, useState } from "react";
 import {TabBar, TabView} from 'react-native-tab-view';
-import { Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import Svg, { Circle, Line, Path, Rect } from "react-native-svg";
 import { getGistContent } from "@/types/commAxios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRecoilValue } from "recoil";
 import { userInfoState } from "@/store/usrInfoState";
+import { useNavigation } from "@react-navigation/native";
 export const windowWidth = Dimensions.get('window').width;
 export const imageWidthSize = windowWidth / 3;
 export const imageHeightSize = windowWidth / 3;
 const BoardRoute = ({memberNm}) => {
-  const [boardList, setBpardList] = useState<[] | null>([]);
+  const navigation = useNavigation();
+  const [boardList, setBoardList] = useState<[] | null>([]);
 
   useEffect(() => {
     const getGistBoard = async () => {
       const boardsString = await getGistContent('gwanStarGramsBoard.json');
       const images = boardsString[memberNm].map((post, index) => ({
-        id: `image-${index}`, // 고유한 id 값 생성
+        usrName: memberNm, // 고유한 id 값 생성
+        boardCd: post.board_cd, // 고유한 id 값 생성
         src: post.image[0], // 첫 번째 이미지 URL
         multiple: post.image.length > 1, // 여러 이미지 여부 확인
       }));
-      setBpardList(images);
+      setBoardList(images);
     };
     getGistBoard();
   }, []);
@@ -33,19 +36,25 @@ const BoardRoute = ({memberNm}) => {
     );
   };
 
+  const boardDtail = (params: { id: string; multiple: boolean; src: string }) => {
+    console.log('params : ', params);
+    navigation.navigate('BoardDetail', params);
+  };
   const renderImage = (image, indexNum) => {
     const isLastImage = (indexNum + 1) % 3 === 0;
     return (
-      <View key={indexNum} style={styles.imageContainer}>
-        <Image style={styles.image} source={{uri: image.src}} />
-        {image.multiple && (
-          <View className={`flex-row absolute ${isLastImage ? 'right-2' : 'right-0'} top-0 h-10 w-10 justify-center items-center`}>
-            <Svg fill="#fff" width="22" height="22" viewBox="0 0 48 48">
-              <Path stroke="#fff" d="M34.8 29.7V11c0-2.9-2.3-5.2-5.2-5.2H11c-2.9 0-5.2 2.3-5.2 5.2v18.7c0 2.9 2.3 5.2 5.2 5.2h18.7c2.8-.1 5.1-2.4 5.1-5.2zM39.2 15v16.1c0 4.5-3.7 8.2-8.2 8.2H14.9c-.6 0-.9.7-.5 1.1 1 1.1 2.4 1.8 4.1 1.8h13.4c5.7 0 10.3-4.6 10.3-10.3V18.5c0-1.6-.7-3.1-1.8-4.1-.5-.4-1.2 0-1.2.6z" />
-            </Svg>
-          </View>
-        )}
-      </View>
+      <Pressable onPress={() => {boardDtail(image);}}>
+        <View key={indexNum} style={styles.imageContainer}>
+          <Image style={styles.image} source={{uri: image.src}} />
+          {image.multiple && (
+            <View className={`flex-row absolute ${isLastImage ? 'right-2' : 'right-0'} top-0 h-10 w-10 justify-center items-center`}>
+              <Svg fill="#fff" width="22" height="22" viewBox="0 0 48 48">
+                <Path stroke="#fff" d="M34.8 29.7V11c0-2.9-2.3-5.2-5.2-5.2H11c-2.9 0-5.2 2.3-5.2 5.2v18.7c0 2.9 2.3 5.2 5.2 5.2h18.7c2.8-.1 5.1-2.4 5.1-5.2zM39.2 15v16.1c0 4.5-3.7 8.2-8.2 8.2H14.9c-.6 0-.9.7-.5 1.1 1 1.1 2.4 1.8 4.1 1.8h13.4c5.7 0 10.3-4.6 10.3-10.3V18.5c0-1.6-.7-3.1-1.8-4.1-.5-.4-1.2 0-1.2.6z" />
+              </Svg>
+            </View>
+          )}
+        </View>
+      </Pressable>
     );
   };
 

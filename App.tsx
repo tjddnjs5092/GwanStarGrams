@@ -28,7 +28,7 @@ function App() {
     <SafeAreaView className="flex-1">
       <NavigationContainer>
         <StatusBar />
-        <AppNavigator className="flex-1 bg-black" />
+        <AppNavigator className="flex-1" />
       </NavigationContainer>
     </SafeAreaView>
   );
