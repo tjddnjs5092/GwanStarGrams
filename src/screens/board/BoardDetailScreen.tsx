@@ -55,13 +55,13 @@ export const BoardDetailScreen = ({navigation, route})=> {
   return (
     <View className="flex-1 bg-black">
       <Header usrNm={route?.params?.usrName} title="게시물" />
-      <ScrollView className="">
+      <ScrollView className="flex-1">
         {boardList && boardList.length > 0 ? (
-          <View className="flex-1">
+          <View className="flex-1 top-3">
             {boardList.map((item, idx) => (
               <View className="flex-1">
-                <View className="flex-row h-50 justify-center items-center">
-                  <View className="flex-1 flex-row m-3">
+                <View className="flex-row justify-center items-center">
+                  <View className="flex-1 flex-row left-3">
                     <Image
                       className="w-10 h-10 rounded-full"
                       source={
@@ -79,26 +79,30 @@ export const BoardDetailScreen = ({navigation, route})=> {
                     <Image className="w-5 h-5" source={require('@/assets/images/more-options.png')} />
                   </View>
                 </View>
-                <View className="mt-3 h-[100%] w-full">
-                  <Image className="flex-1" source={{uri: item.image[idx]}} resizeMode="cover" />
-                </View>
-                <View className="flex-row h-10 justify-center items-center">
-                  <View className="flex-1 flex-row items-center top-2">
-                    <View className="m-3">
-                      <Image source={require('@/assets/images/heart.png')} />
-                    </View>
-                    <View className="m-3">
-                      <Image source={require('@/assets/images/comments.png')} />
-                    </View>
-                    <View className="m-3">
-                      <Image source={require('@/assets/images/send.png')} />
-                    </View>
-                  </View>
-                  <View className="right-3 top-2">
-                    <Image source={require('@/assets/images/saved.png')} />
+                <View className="h-96">
+                  <View className="flex-1 m-3">
+                    <Image className="h-[100%]" source={{uri: item.image[0]}} resizeMode="cover" />
                   </View>
                 </View>
-                <View className="mt-3 m-3">
+                <View className="flex-1 bottom-2">
+                  <View className="flex-row justify-center items-center">
+                    <View className="flex-1 flex-row">
+                      <View className="m-3">
+                        <Image source={require('@/assets/images/heart.png')} />
+                      </View>
+                      <View className="m-3">
+                        <Image source={require('@/assets/images/comments.png')} />
+                      </View>
+                      <View className="m-3">
+                        <Image source={require('@/assets/images/send.png')} />
+                      </View>
+                    </View>
+                    <View className="right-3">
+                      <Image source={require('@/assets/images/saved.png')} />
+                    </View>
+                  </View>
+                </View>
+                <View className="m-3 bottom-5">
                   <Text className="text-white font-bold">좋아요 {item.like}개</Text>
                   <View className="flex-row mt-1">
                     <Text className="text-white font-bold">{route?.params?.usrName} </Text>
@@ -119,3 +123,4 @@ export const BoardDetailScreen = ({navigation, route})=> {
     </View>
   )
 };
+

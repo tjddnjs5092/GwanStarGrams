@@ -96,7 +96,7 @@ export const MyPageScreen = ({navigation, route}) => {
         {/* 프로필사진 / 게시물 / 팔로워 / 팔로잉 */}
         <View className="flex-row h-40">
           <View className="flex-1 flex-row">
-            <View className="top-5 w-[30%] h-[75%]">
+            <View className="top-5 w-[30%] h-[70%]">
               <Image
                 className="w-[100%] h-[100%] rounded-full"
                 source={

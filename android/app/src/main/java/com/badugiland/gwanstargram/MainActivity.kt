@@ -1,4 +1,4 @@
-package com.gwanstargram
+package com.badugiland.gwanstargram
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
