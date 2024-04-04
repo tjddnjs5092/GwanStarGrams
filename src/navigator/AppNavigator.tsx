@@ -7,6 +7,7 @@ import {userInfoState} from '@/store/usrInfoState';
 import {MyPageScreen} from '@/screens/myPage/MyPageScreen';
 import {MypageTabViewScreen} from '@/screens/myPage/MypageTabViewScreen';
 import { BoardDetailScreen } from "@/screens/board/BoardDetailScreen";
+import DataItem from "@/types/DataItem";
 
 function AppNavigator() {
   const Stack = createNativeStackNavigator();
@@ -27,6 +28,7 @@ function AppNavigator() {
             <Stack.Screen name="MyPage" component={MyPageScreen} />
             <Stack.Screen name="MypageTabView" component={MypageTabViewScreen} />
             <Stack.Screen name="BoardDetail" component={BoardDetailScreen} />
+            <Stack.Screen name="DataItem" component={DataItem} />
           </>
         )}
       </Stack.Group>
