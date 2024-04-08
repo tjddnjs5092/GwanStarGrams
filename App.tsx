@@ -1,11 +1,14 @@
 import React, { useEffect } from "react";
-import {SafeAreaView, StatusBar} from 'react-native';
+import { Dimensions, SafeAreaView, StatusBar } from "react-native";
 import AppNavigator from '@/navigator/AppNavigator';
 import {NavigationContainer} from '@react-navigation/native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRecoilState } from "recoil";
 import { userInfoState } from "@/store/usrInfoState";
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
+export const windowWidth = Dimensions.get('window').width;
+export const windowHeight = Dimensions.get('window').height;
 function App() {
   const [usrInfo, setUsrInfo] = useRecoilState(userInfoState);
 
@@ -26,10 +29,12 @@ function App() {
   }, []);
   return (
     <SafeAreaView className="flex-1">
-      <NavigationContainer>
-        <StatusBar />
-        <AppNavigator className="flex-1" />
-      </NavigationContainer>
+      <GestureHandlerRootView style={{flex: 1}}>
+        <NavigationContainer>
+          <StatusBar />
+          <AppNavigator className="flex-1" />
+        </NavigationContainer>
+      </GestureHandlerRootView>
     </SafeAreaView>
   );
 }
