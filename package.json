@@ -6,6 +6,8 @@
     "android": "react-native run-android --terminal terminal",
     "android:dev": "ENVFILE=.env.dev react-native run-android --variant=devDebug --terminal terminal",
     "android:prod": "ENVFILE=.env.prod react-native run-android --variant=prodDebug --terminal terminal",
+    "make-apk:dev": "cd android && ./gradlew assembleRelease",
+    "make-apk:prod": "cd android && ./gradlew bundleRelease",
     "ios": "react-native run-ios --terminal terminal",
     "ios:dev": "react-native run-ios --scheme GwanStarGram.dev --terminal terminal",
     "ios:prod": "react-native run-ios --scheme GwanStarGram.prod --terminal terminal",

@@ -17,7 +17,9 @@
       ],
       "comment": [
         {
+          "comment_dt": "20240328112842",
           "nickName": "test2",
+          "commentUsrImage": "https://i.ibb.co/xJgcjfR/jpg.jpg",
           "commentCont": "오 대박이다요",
           "commentLike": 2,
           "commentLikeUsr": [{
@@ -26,7 +28,9 @@
           ],
           "reply": [
             {
+              "reply_dt": "20240328122842",
               "nickname": "test",
+              "replyUsrImage":"https://i.ibb.co/xJgcjfR/jpg.jpg",
               "replyCont": "감사합니다.",
               "replyLike": 1,
               "replyLikeUsr": [
@@ -38,7 +42,9 @@
           ]
         },
         {
+          "comment_dt": "20240411141042",
           "nickName": "test3",
+          "commentUsrImage": "https://i.ibb.co/9hZQRq0/png.png",
           "commentCont": "와 이쁘다 사고싶네요",
           "commentLike": 0,
           "commentLikeUsr": [{

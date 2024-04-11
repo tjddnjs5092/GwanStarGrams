@@ -17,7 +17,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const navigation = useNavigation();
   return (
-    <View className="h-11 justify-center items-center border-b border-[#a8a8a8] mb-2">
+    <View className="h-11 justify-center items-center border-b border-[#363636] mb-2">
       <Pressable>
         <View className="flex-1 justify-center">
           <Text className="text-[#a8a8a8] uppercase">{usrNm}</Text>

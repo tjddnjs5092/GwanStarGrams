@@ -8,7 +8,7 @@ import { getGistContent } from "@/types/commAxios";
 import { Pagination } from "@/components/Pagination";
 import {Modalize} from 'react-native-modalize';
 import { windowHeight, windowWidth } from "../../../App";
-import { CommentModal } from "@/components/CommentModal";
+import { PanGestureHandler, State } from "react-native-gesture-handler";
 
 export const BoardDetailScreen = ({navigation, route})=> {
   const {memberInfo, storeMbrCd} = useRecoilValue(userInfoState);
@@ -17,7 +17,6 @@ export const BoardDetailScreen = ({navigation, route})=> {
   const scrollViewRef = useRef(null);
   const [positions, setPositions] = useState({}); // 각 게시물의 위치를 저장하는 상태
   const modalizeRef = useRef<Modalize>(null);
-  const [modalHeight, setModalHeight] = useState(windowHeight * 0.7);
   const selectedBoardId = route.params?.boardCd;
 
   useEffect(() => {
@@ -86,15 +85,10 @@ export const BoardDetailScreen = ({navigation, route})=> {
     }));
   };
 
-  const adjustModalHeight = () => {
-    setModalHeight(windowHeight * 0.5); // Example adjustment
-  };
-
   const openModel = (item) => {
     console.log('item : ', item);
     modalizeRef.current?.open();
   };
-
   return (
     <View className="flex-1 bg-black">
       <Header usrNm={route?.params?.usrName} title="게시물" />
@@ -155,7 +149,7 @@ export const BoardDetailScreen = ({navigation, route})=> {
                           <Pressable>
                             <Image source={require('@/assets/images/heart.png')} />
                           </Pressable>
-                          <Pressable className="left-3" onPress={() => {openModel(item)}}>
+                          <Pressable className="left-3" onPress={() => {openModel(item.comment)}}>
                             <Image className={` ${item.image.length > 1 ? "left-6" : ""}`} source={require('@/assets/images/comments.png')} />
                           </Pressable>
                           <Pressable className={`${item.image.length > 1 ? "left-12" : ""}`}>
@@ -183,7 +177,9 @@ export const BoardDetailScreen = ({navigation, route})=> {
                         <Text className="text-white font-bold">{route?.params?.usrName} </Text>
                         <Text className="text-white font-bold">{item.cont}</Text>
                       </View>
-                      <Text className="mt-1 text-[#a8a8a8]">댓글 {item.comment?.length ?? 0}개 모두 보기</Text>
+                      <Pressable className="mt-1-3" onPress={() => {openModel(item.comment)}}>
+                        <Text className="text-[#a8a8a8]">댓글 {item.comment?.length ?? 0}개 모두 보기</Text>
+                      </Pressable>
                       <Text className="mt-1 text-[#a8a8a8]">{calculateTimeDifference(item.board_cd)}</Text>
                     </View>
                   </View>
@@ -196,20 +192,26 @@ export const BoardDetailScreen = ({navigation, route})=> {
             <Text className="text-white">로딩중</Text>
           </View>
         )}
-        <Modalize
-          ref={modalizeRef}
-          modalHeight={modalHeight}
-          handlePosition="inside"
-          // Add your other modal configurations here
-        >
-          <View >
-            <Text>Modal Content Here</Text>
-            <TouchableOpacity onPress={adjustModalHeight}>
-              <Text>Adjust Height</Text>
-            </TouchableOpacity>
-          </View>
-        </Modalize>
       </ScrollView>
+      <Modalize
+        ref={modalizeRef}
+        handlePosition="inside"
+        handleStyle={{backgroundColor: '#555555'}}
+        modalHeight={780}
+        snapPoint={600}
+        closeSnapPointStraightEnabled={false}
+        scrollViewProps={{showsVerticalScrollIndicator: false}}
+        modalStyle={{backgroundColor: '#262626'}}
+      >
+        <View className="flex-1 mt-5">
+          <View className="items-center border-b border-[#363636]">
+            <Text className="font-200 text-white font-bold mb-5 mt-3">댓글</Text>
+          </View>
+          <TouchableOpacity>
+            <Text>Adjust Height</Text>
+          </TouchableOpacity>
+        </View>
+      </Modalize>
     </View>
   )
 };
