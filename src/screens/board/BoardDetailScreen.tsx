@@ -1,4 +1,14 @@
-import { Dimensions, Image, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Dimensions,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text, Touchable,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View
+} from "react-native";
 import { Header } from "@/components/tw/Header";
 import { useRecoilValue } from "recoil";
 import { userInfoState } from "@/store/usrInfoState";
@@ -8,21 +18,24 @@ import { getGistContent } from "@/types/commAxios";
 import { Pagination } from "@/components/Pagination";
 import {Modalize} from 'react-native-modalize';
 import { windowHeight, windowWidth } from "../../../App";
-import { PanGestureHandler, State } from "react-native-gesture-handler";
+import moment from 'moment';
+import 'moment/locale/ko'
 
 export const BoardDetailScreen = ({navigation, route})=> {
   const {memberInfo, storeMbrCd} = useRecoilValue(userInfoState);
   const [boardList, setBoardList] = useState<[] | null>([]);
+  const [modalizeItem, setModalizeItem] = useState<[] | null>([]);
   const [pageIndices, setPageIndices] = useState({});
   const scrollViewRef = useRef(null);
   const [positions, setPositions] = useState({}); // 각 게시물의 위치를 저장하는 상태
   const modalizeRef = useRef<Modalize>(null);
   const selectedBoardId = route.params?.boardCd;
+  const userNameParams = route?.params.usrName;
 
   useEffect(() => {
     const myBoardList = async () => {
       const boardsString = await getGistContent('gwanStarGramsBoard.json');
-      const images = boardsString[route?.params.usrName];
+      const images = boardsString[userNameParams];
       setBoardList(images);
     };
     myBoardList();
@@ -85,13 +98,47 @@ export const BoardDetailScreen = ({navigation, route})=> {
     }));
   };
 
+  const formatTimeAgo = (dateTimeString) => {
+    const now = moment();
+    const pastDate = moment(dateTimeString, 'YYYYMMDDHHmmss');
+    const diffInMinutes = now.diff(pastDate, 'minutes');
+
+    if (diffInMinutes < 1) {
+      return '방금 전';
+    } else if (diffInMinutes < 60) {
+      return `${diffInMinutes}분`;
+    } else if (diffInMinutes < 60 * 24) {
+      return `${Math.floor(diffInMinutes / 60)}시간`;
+    } else if (diffInMinutes < 60 * 24 * 7) {
+      return `${Math.floor(diffInMinutes / (60 * 24))}일`;
+    } else if (diffInMinutes < 60 * 24 * 30) {
+      return `${Math.floor(diffInMinutes / (60 * 24 * 7))}주`;
+    } else if (diffInMinutes < 60 * 24 * 365) {
+      return `${Math.floor(diffInMinutes / (60 * 24 * 30))}달`;
+    } else {
+      return `${Math.floor(diffInMinutes / (60 * 24 * 365))}년`;
+    }
+  };
+
   const openModel = (item) => {
-    console.log('item : ', item);
+    const newItem = item.map(comment => {
+      const formattedCommentDt = formatTimeAgo(comment.comment_dt);
+
+      // 각 댓글의 답글의 reply_dt를 형식화
+      const formattedReply = comment.reply?.map(reply => {
+        const formattedReplyDt = formatTimeAgo(reply.reply_dt);
+        return { ...reply, formattedReplyDt: formattedReplyDt }; // reply_dt를 형식화된 값으로 변경하여 반환
+      });
+      return { ...comment, formattedCommentDt: formattedCommentDt, reply: formattedReply }; // comment_dt를 형식화된 값으로 변경하여 반환
+    });
+
+    console.log('newItem : ', newItem);
+    setModalizeItem(newItem);
     modalizeRef.current?.open();
   };
   return (
     <View className="flex-1 bg-black">
-      <Header usrNm={route?.params?.usrName} title="게시물" />
+      <Header usrNm={userNameParams} title="게시물" />
       <ScrollView ref={scrollViewRef} className="flex-1">
         {boardList && boardList.length > 0 ? (
           <View className="flex-1 top-3">
@@ -114,7 +161,7 @@ export const BoardDetailScreen = ({navigation, route})=> {
                           resizeMode="cover"
                         />
                         <View className="justify-center ml-3">
-                          <Text className="text-white font-bold">{route?.params?.usrName}</Text>
+                          <Text className="text-white font-bold">{userNameParams}</Text>
                         </View>
                       </View>
                       <View className="mr-3">
@@ -202,14 +249,544 @@ export const BoardDetailScreen = ({navigation, route})=> {
         closeSnapPointStraightEnabled={false}
         scrollViewProps={{showsVerticalScrollIndicator: false}}
         modalStyle={{backgroundColor: '#262626'}}
+        onOpen={() => {
+          // Once the modal is open, measure the content height and adjust modalHeight
+          const contentHeight = modalizeRef.current.scrollView.contentSize.height;
+          modalizeRef.current.setScrollViewHeight(contentHeight + 100); // Add some buffer
+        }}
       >
         <View className="flex-1 mt-5">
           <View className="items-center border-b border-[#363636]">
             <Text className="font-200 text-white font-bold mb-5 mt-3">댓글</Text>
           </View>
-          <TouchableOpacity>
-            <Text>Adjust Height</Text>
-          </TouchableOpacity>
+          {/*{modalizeItem.map((item, idx) => (
+            <View className="flex-1 flex-row m-3">
+              <Image
+                className="w-10 h-10 rounded-full"
+                source={
+                  item.commentUsrImage !== ''
+                    ? {uri: item.commentUsrImage}
+                    : require('@/assets/images/noImg.png')
+                }
+                resizeMode="cover"
+              />
+              <View className="justify-center ml-3">
+                <Text className="text-white font-bold">{userNameParams}</Text>
+              </View>
+            </View>
+          ))}*/}
+
+          {/*<Image
+                  className="w-10 h-10 rounded-full"
+                  source={require('@/assets/images/noImg.png')}
+                  resizeMode="cover"
+                />
+                <View className="justify-center ml-3">
+                  <View className="flex-row">
+                    <Text className="text-white font-bold text-xs">{userNameParams}</Text>
+                    <Text className="text-[#a8a8a8] text-xs left-1">2일</Text>
+                    <Text className="text-[#a8a8a8] left-1"> ‧ </Text>
+                    <Image
+                      className="w-4 h-4 left-1"
+                      source={require('@/assets/images/heartO.png')}
+                      resizeMode="cover"
+                    />
+                    <Text className="text-[#a8a8a8] left-2 text-xs">작성자가 좋아하는 댓글</Text>
+                  </View>
+                  <View className="top-1">
+                    <Text className="text-white font-bold w-[16%]">가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하</Text>
+                    <Text className="text-[#a8a8a8] top-2 text-xs font-bold">답글 달기</Text>
+                    <View className="flex-row">
+                      <Text className="text-[#363636] top-5 text-xs">———  </Text>
+                      <Text className="text-[#a8a8a8] top-5 text-xs font-bold">이전 답글 1개 더 보기</Text>
+                    </View>
+                  </View>
+
+                  <View className="flex-1 flex-row w-screen top-10 mb-10">
+                    <Image
+                      className="w-10 h-10 rounded-full"
+                      source={require('@/assets/images/noImg.png')}
+                      resizeMode="cover"
+                    />
+                    <View className="justify-center ml-3">
+                      <View className="flex-row">
+                        <Text className="text-white font-bold text-xs">{userNameParams}</Text>
+                        <Text className="text-[#a8a8a8] text-xs left-1">2일</Text>
+                        <Text className="text-[#a8a8a8] left-1"> ‧ </Text>
+                        <Image
+                          className="w-4 h-4 left-1"
+                          source={require('@/assets/images/heartO.png')}
+                          resizeMode="cover"
+                        />
+                        <Text className="text-[#a8a8a8] left-2 text-xs">작성자가 좋아하는 댓글</Text>
+                      </View>
+                      <View className="top-1">
+                        <Text className="text-white font-bold w-[20%]">가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하</Text>
+                        <Text className="text-[#a8a8a8] top-2 text-xs font-bold">답글 달기</Text>
+                      </View>
+                    </View>
+                    <View className="absolute left-80 top-3 justify-center items-center">
+                      <Image
+                        className="w-5 h-5"
+                        source={require('@/assets/images/heart.png')}
+                        resizeMode="cover"
+                      />
+                      <Text className="text-[#a8a8a8] top-2 text-xs font-bold">10</Text>
+                    </View>
+                  </View>
+                  <View className="flex-1 flex-row w-screen top-10">
+                    <Image
+                      className="w-10 h-10 rounded-full"
+                      source={require('@/assets/images/noImg.png')}
+                      resizeMode="cover"
+                    />
+                    <View className="justify-center ml-3">
+                      <View className="flex-row">
+                        <Text className="text-white font-bold text-xs">{userNameParams}</Text>
+                        <Text className="text-[#a8a8a8] text-xs left-1">2일</Text>
+                        <Text className="text-[#a8a8a8] left-1"> ‧ </Text>
+                        <Image
+                          className="w-4 h-4 left-1"
+                          source={require('@/assets/images/heartO.png')}
+                          resizeMode="cover"
+                        />
+                        <Text className="text-[#a8a8a8] left-2 text-xs">작성자가 좋아하는 댓글</Text>
+                      </View>
+                      <View className="top-1">
+                        <Text className="text-white font-bold">가나다라마바사아자차카타파하</Text>
+                        <Text className="text-[#a8a8a8] top-2 text-xs font-bold">답글 달기</Text>
+                      </View>
+                    </View>
+                    <View className="absolute left-80 top-3 justify-center items-center">
+                      <Image
+                        className="w-5 h-5"
+                        source={require('@/assets/images/heart.png')}
+                        resizeMode="cover"
+                      />
+                      <Text className="text-[#a8a8a8] top-2 text-xs font-bold">10</Text>
+                    </View>
+                  </View>
+                </View>*/}
+          <ScrollView ScrollView style={{ flex: 1 }}>
+              <View className="flex-1 h-full">
+                <View className="flex-row m-3 mb-12">
+                  <Image
+                    className="w-10 h-10 rounded-full"
+                    source={require('@/assets/images/noImg.png')}
+                    resizeMode="cover"
+                  />
+                  <View className="justify-center ml-3">
+                    <View className="flex-row">
+                      <Text className="text-white font-bold text-xs">{userNameParams}</Text>
+                      <Text className="text-[#a8a8a8] text-xs left-1">2일</Text>
+                      <Text className="text-[#a8a8a8] left-1"> ‧ </Text>
+                      <Image
+                        className="w-4 h-4 left-1"
+                        source={require('@/assets/images/heartO.png')}
+                        resizeMode="cover"
+                      />
+                      <Text className="text-[#a8a8a8] left-2 text-xs">작성자가 좋아하는 댓글</Text>
+                    </View>
+                    <View className="top-1">
+                      <Text className="text-white font-bold">가나다라마바사아자차카타파하</Text>
+                      <Text className="text-[#a8a8a8] top-2 text-xs font-bold">답글 달기</Text>
+                      <View className="flex-row">
+                        <Text className="text-[#363636] top-5 text-xs">———  </Text>
+                        <Text className="text-[#a8a8a8] top-5 text-xs font-bold">답글 1개 더 보기</Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View className="absolute right-3 top-3 justify-center items-center">
+                    <Image
+                      className="w-5 h-5"
+                      source={require('@/assets/images/heart.png')}
+                      resizeMode="cover"
+                    />
+                    <Text className="text-[#a8a8a8] top-2 text-xs font-bold">10</Text>
+                  </View>
+                </View>
+              </View>
+              <View className="flex-1 h-[100%]">
+                <View className="flex-row m-3 mb-12">
+                  <Image
+                    className="w-10 h-10 rounded-full"
+                    source={require('@/assets/images/noImg.png')}
+                    resizeMode="cover"
+                  />
+                  <View className="justify-center ml-3">
+                    <View className="flex-row">
+                      <Text className="text-white font-bold text-xs">{userNameParams}</Text>
+                      <Text className="text-[#a8a8a8] text-xs left-1">2일</Text>
+                      <Text className="text-[#a8a8a8] left-1"> ‧ </Text>
+                      <Image
+                        className="w-4 h-4 left-1"
+                        source={require('@/assets/images/heartO.png')}
+                        resizeMode="cover"
+                      />
+                      <Text className="text-[#a8a8a8] left-2 text-xs">작성자가 좋아하는 댓글</Text>
+                    </View>
+                    <View className="top-1">
+                      <Text className="text-white font-bold">가나다라마바사아자차카타파하</Text>
+                      <Text className="text-[#a8a8a8] top-2 text-xs font-bold">답글 달기</Text>
+                      <View className="flex-row">
+                        <Text className="text-[#363636] top-5 text-xs">———  </Text>
+                        <Text className="text-[#a8a8a8] top-5 text-xs font-bold">답글 1개 더 보기</Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View className="absolute right-3 top-3 justify-center items-center">
+                    <Image
+                      className="w-5 h-5"
+                      source={require('@/assets/images/heart.png')}
+                      resizeMode="cover"
+                    />
+                    <Text className="text-[#a8a8a8] top-2 text-xs font-bold">10</Text>
+                  </View>
+                </View>
+              </View>
+              <View className="flex-1 h-[100%]">
+                <View className="flex-row m-3 mb-12">
+                  <Image
+                    className="w-10 h-10 rounded-full"
+                    source={require('@/assets/images/noImg.png')}
+                    resizeMode="cover"
+                  />
+                  <View className="justify-center ml-3">
+                    <View className="flex-row">
+                      <Text className="text-white font-bold text-xs">{userNameParams}</Text>
+                      <Text className="text-[#a8a8a8] text-xs left-1">2일</Text>
+                      <Text className="text-[#a8a8a8] left-1"> ‧ </Text>
+                      <Image
+                        className="w-4 h-4 left-1"
+                        source={require('@/assets/images/heartO.png')}
+                        resizeMode="cover"
+                      />
+                      <Text className="text-[#a8a8a8] left-2 text-xs">작성자가 좋아하는 댓글</Text>
+                    </View>
+                    <View className="top-1">
+                      <Text className="text-white font-bold">가나다라마바사아자차카타파하</Text>
+                      <Text className="text-[#a8a8a8] top-2 text-xs font-bold">답글 달기</Text>
+                      <View className="flex-row">
+                        <Text className="text-[#363636] top-5 text-xs">———  </Text>
+                        <Text className="text-[#a8a8a8] top-5 text-xs font-bold">답글 1개 더 보기</Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View className="absolute right-3 top-3 justify-center items-center">
+                    <Image
+                      className="w-5 h-5"
+                      source={require('@/assets/images/heart.png')}
+                      resizeMode="cover"
+                    />
+                    <Text className="text-[#a8a8a8] top-2 text-xs font-bold">10</Text>
+                  </View>
+                </View>
+              </View>
+              <View className="flex-1 h-[100%]">
+                <View className="flex-row m-3 mb-12">
+                  <Image
+                    className="w-10 h-10 rounded-full"
+                    source={require('@/assets/images/noImg.png')}
+                    resizeMode="cover"
+                  />
+                  <View className="justify-center ml-3">
+                    <View className="flex-row">
+                      <Text className="text-white font-bold text-xs">{userNameParams}</Text>
+                      <Text className="text-[#a8a8a8] text-xs left-1">2일</Text>
+                      <Text className="text-[#a8a8a8] left-1"> ‧ </Text>
+                      <Image
+                        className="w-4 h-4 left-1"
+                        source={require('@/assets/images/heartO.png')}
+                        resizeMode="cover"
+                      />
+                      <Text className="text-[#a8a8a8] left-2 text-xs">작성자가 좋아하는 댓글</Text>
+                    </View>
+                    <View className="top-1">
+                      <Text className="text-white font-bold">가나다라마바사아자차카타파하</Text>
+                      <Text className="text-[#a8a8a8] top-2 text-xs font-bold">답글 달기</Text>
+                      <View className="flex-row">
+                        <Text className="text-[#363636] top-5 text-xs">———  </Text>
+                        <Text className="text-[#a8a8a8] top-5 text-xs font-bold">답글 1개 더 보기</Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View className="absolute right-3 top-3 justify-center items-center">
+                    <Image
+                      className="w-5 h-5"
+                      source={require('@/assets/images/heart.png')}
+                      resizeMode="cover"
+                    />
+                    <Text className="text-[#a8a8a8] top-2 text-xs font-bold">10</Text>
+                  </View>
+                </View>
+              </View>
+              <View className="flex-1 h-[100%]">
+                <View className="flex-row m-3 mb-12">
+                  <Image
+                    className="w-10 h-10 rounded-full"
+                    source={require('@/assets/images/noImg.png')}
+                    resizeMode="cover"
+                  />
+                  <View className="justify-center ml-3">
+                    <View className="flex-row">
+                      <Text className="text-white font-bold text-xs">{userNameParams}</Text>
+                      <Text className="text-[#a8a8a8] text-xs left-1">2일</Text>
+                      <Text className="text-[#a8a8a8] left-1"> ‧ </Text>
+                      <Image
+                        className="w-4 h-4 left-1"
+                        source={require('@/assets/images/heartO.png')}
+                        resizeMode="cover"
+                      />
+                      <Text className="text-[#a8a8a8] left-2 text-xs">작성자가 좋아하는 댓글</Text>
+                    </View>
+                    <View className="top-1">
+                      <Text className="text-white font-bold">가나다라마바사아자차카타파하</Text>
+                      <Text className="text-[#a8a8a8] top-2 text-xs font-bold">답글 달기</Text>
+                      <View className="flex-row">
+                        <Text className="text-[#363636] top-5 text-xs">———  </Text>
+                        <Text className="text-[#a8a8a8] top-5 text-xs font-bold">답글 1개 더 보기</Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View className="absolute right-3 top-3 justify-center items-center">
+                    <Image
+                      className="w-5 h-5"
+                      source={require('@/assets/images/heart.png')}
+                      resizeMode="cover"
+                    />
+                    <Text className="text-[#a8a8a8] top-2 text-xs font-bold">10</Text>
+                  </View>
+                </View>
+              </View>
+              <View className="flex-1 h-[100%]">
+                <View className="flex-row m-3 mb-12">
+                  <Image
+                    className="w-10 h-10 rounded-full"
+                    source={require('@/assets/images/noImg.png')}
+                    resizeMode="cover"
+                  />
+                  <View className="justify-center ml-3">
+                    <View className="flex-row">
+                      <Text className="text-white font-bold text-xs">{userNameParams}</Text>
+                      <Text className="text-[#a8a8a8] text-xs left-1">2일</Text>
+                      <Text className="text-[#a8a8a8] left-1"> ‧ </Text>
+                      <Image
+                        className="w-4 h-4 left-1"
+                        source={require('@/assets/images/heartO.png')}
+                        resizeMode="cover"
+                      />
+                      <Text className="text-[#a8a8a8] left-2 text-xs">작성자가 좋아하는 댓글</Text>
+                    </View>
+                    <View className="top-1">
+                      <Text className="text-white font-bold">가나다라마바사아자차카타파하</Text>
+                      <Text className="text-[#a8a8a8] top-2 text-xs font-bold">답글 달기</Text>
+                      <View className="flex-row">
+                        <Text className="text-[#363636] top-5 text-xs">———  </Text>
+                        <Text className="text-[#a8a8a8] top-5 text-xs font-bold">답글 1개 더 보기</Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View className="absolute right-3 top-3 justify-center items-center">
+                    <Image
+                      className="w-5 h-5"
+                      source={require('@/assets/images/heart.png')}
+                      resizeMode="cover"
+                    />
+                    <Text className="text-[#a8a8a8] top-2 text-xs font-bold">10</Text>
+                  </View>
+                </View>
+              </View>
+              <View className="flex-1 h-[100%]">
+                <View className="flex-row m-3 mb-12">
+                  <Image
+                    className="w-10 h-10 rounded-full"
+                    source={require('@/assets/images/noImg.png')}
+                    resizeMode="cover"
+                  />
+                  <View className="justify-center ml-3">
+                    <View className="flex-row">
+                      <Text className="text-white font-bold text-xs">{userNameParams}</Text>
+                      <Text className="text-[#a8a8a8] text-xs left-1">2일</Text>
+                      <Text className="text-[#a8a8a8] left-1"> ‧ </Text>
+                      <Image
+                        className="w-4 h-4 left-1"
+                        source={require('@/assets/images/heartO.png')}
+                        resizeMode="cover"
+                      />
+                      <Text className="text-[#a8a8a8] left-2 text-xs">작성자가 좋아하는 댓글</Text>
+                    </View>
+                    <View className="top-1">
+                      <Text className="text-white font-bold">가나다라마바사아자차카타파하</Text>
+                      <Text className="text-[#a8a8a8] top-2 text-xs font-bold">답글 달기</Text>
+                      <View className="flex-row">
+                        <Text className="text-[#363636] top-5 text-xs">———  </Text>
+                        <Text className="text-[#a8a8a8] top-5 text-xs font-bold">답글 1개 더 보기</Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View className="absolute right-3 top-3 justify-center items-center">
+                    <Image
+                      className="w-5 h-5"
+                      source={require('@/assets/images/heart.png')}
+                      resizeMode="cover"
+                    />
+                    <Text className="text-[#a8a8a8] top-2 text-xs font-bold">10</Text>
+                  </View>
+                </View>
+              </View>
+              <View className="flex-1 h-[100%]">
+                <View className="flex-row m-3 mb-12">
+                  <Image
+                    className="w-10 h-10 rounded-full"
+                    source={require('@/assets/images/noImg.png')}
+                    resizeMode="cover"
+                  />
+                  <View className="justify-center ml-3">
+                    <View className="flex-row">
+                      <Text className="text-white font-bold text-xs">{userNameParams}</Text>
+                      <Text className="text-[#a8a8a8] text-xs left-1">2일</Text>
+                      <Text className="text-[#a8a8a8] left-1"> ‧ </Text>
+                      <Image
+                        className="w-4 h-4 left-1"
+                        source={require('@/assets/images/heartO.png')}
+                        resizeMode="cover"
+                      />
+                      <Text className="text-[#a8a8a8] left-2 text-xs">작성자가 좋아하는 댓글</Text>
+                    </View>
+                    <View className="top-1">
+                      <Text className="text-white font-bold">가나다라마바사아자차카타파하</Text>
+                      <Text className="text-[#a8a8a8] top-2 text-xs font-bold">답글 달기</Text>
+                      <View className="flex-row">
+                        <Text className="text-[#363636] top-5 text-xs">———  </Text>
+                        <Text className="text-[#a8a8a8] top-5 text-xs font-bold">답글 1개 더 보기</Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View className="absolute right-3 top-3 justify-center items-center">
+                    <Image
+                      className="w-5 h-5"
+                      source={require('@/assets/images/heart.png')}
+                      resizeMode="cover"
+                    />
+                    <Text className="text-[#a8a8a8] top-2 text-xs font-bold">10</Text>
+                  </View>
+                </View>
+              </View>
+              <View className="flex-1 h-[100%]">
+                <View className="flex-row m-3 mb-12">
+                  <Image
+                    className="w-10 h-10 rounded-full"
+                    source={require('@/assets/images/noImg.png')}
+                    resizeMode="cover"
+                  />
+                  <View className="justify-center ml-3">
+                    <View className="flex-row">
+                      <Text className="text-white font-bold text-xs">{userNameParams}</Text>
+                      <Text className="text-[#a8a8a8] text-xs left-1">2일</Text>
+                      <Text className="text-[#a8a8a8] left-1"> ‧ </Text>
+                      <Image
+                        className="w-4 h-4 left-1"
+                        source={require('@/assets/images/heartO.png')}
+                        resizeMode="cover"
+                      />
+                      <Text className="text-[#a8a8a8] left-2 text-xs">작성자가 좋아하는 댓글</Text>
+                    </View>
+                    <View className="top-1">
+                      <Text className="text-white font-bold">가나다라마바사아자차카타파하</Text>
+                      <Text className="text-[#a8a8a8] top-2 text-xs font-bold">답글 달기</Text>
+                      <View className="flex-row">
+                        <Text className="text-[#363636] top-5 text-xs">———  </Text>
+                        <Text className="text-[#a8a8a8] top-5 text-xs font-bold">답글 1개 더 보기</Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View className="absolute right-3 top-3 justify-center items-center">
+                    <Image
+                      className="w-5 h-5"
+                      source={require('@/assets/images/heart.png')}
+                      resizeMode="cover"
+                    />
+                    <Text className="text-[#a8a8a8] top-2 text-xs font-bold">10</Text>
+                  </View>
+                </View>
+              </View>
+              <View className="flex-1 h-[100%]">
+                <View className="flex-row m-3 mb-12">
+                  <Image
+                    className="w-10 h-10 rounded-full"
+                    source={require('@/assets/images/noImg.png')}
+                    resizeMode="cover"
+                  />
+                  <View className="justify-center ml-3">
+                    <View className="flex-row">
+                      <Text className="text-white font-bold text-xs">{userNameParams}</Text>
+                      <Text className="text-[#a8a8a8] text-xs left-1">2일</Text>
+                      <Text className="text-[#a8a8a8] left-1"> ‧ </Text>
+                      <Image
+                        className="w-4 h-4 left-1"
+                        source={require('@/assets/images/heartO.png')}
+                        resizeMode="cover"
+                      />
+                      <Text className="text-[#a8a8a8] left-2 text-xs">작성자가 좋아하는 댓글</Text>
+                    </View>
+                    <View className="top-1">
+                      <Text className="text-white font-bold">가나다라마바사아자차카타파하</Text>
+                      <Text className="text-[#a8a8a8] top-2 text-xs font-bold">답글 달기</Text>
+                      <View className="flex-row">
+                        <Text className="text-[#363636] top-5 text-xs">———  </Text>
+                        <Text className="text-[#a8a8a8] top-5 text-xs font-bold">답글 1개 더 보기</Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View className="absolute right-3 top-3 justify-center items-center">
+                    <Image
+                      className="w-5 h-5"
+                      source={require('@/assets/images/heart.png')}
+                      resizeMode="cover"
+                    />
+                    <Text className="text-[#a8a8a8] top-2 text-xs font-bold">10</Text>
+                  </View>
+                </View>
+              </View>
+              <View className="flex-1 h-[100%]">
+                <View className="flex-row m-3 mb-12">
+                  <Image
+                    className="w-10 h-10 rounded-full"
+                    source={require('@/assets/images/noImg.png')}
+                    resizeMode="cover"
+                  />
+                  <View className="justify-center ml-3">
+                    <View className="flex-row">
+                      <Text className="text-white font-bold text-xs">{userNameParams}</Text>
+                      <Text className="text-[#a8a8a8] text-xs left-1">2일</Text>
+                      <Text className="text-[#a8a8a8] left-1"> ‧ </Text>
+                      <Image
+                        className="w-4 h-4 left-1"
+                        source={require('@/assets/images/heartO.png')}
+                        resizeMode="cover"
+                      />
+                      <Text className="text-[#a8a8a8] left-2 text-xs">작성자가 좋아하는 댓글</Text>
+                    </View>
+                    <View className="top-1">
+                      <Text className="text-white font-bold">가나다라마바사아자차카타파하</Text>
+                      <Text className="text-[#a8a8a8] top-2 text-xs font-bold">답글 달기</Text>
+                      <View className="flex-row">
+                        <Text className="text-[#363636] top-5 text-xs">———  </Text>
+                        <Text className="text-[#a8a8a8] top-5 text-xs font-bold">답글 1개 더 보기</Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View className="absolute right-3 top-3 justify-center items-center">
+                    <Image
+                      className="w-5 h-5"
+                      source={require('@/assets/images/heart.png')}
+                      resizeMode="cover"
+                    />
+                    <Text className="text-[#a8a8a8] top-2 text-xs font-bold">10</Text>
+                  </View>
+                </View>
+              </View>
+            </ScrollView>
         </View>
       </Modalize>
     </View>
